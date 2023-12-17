@@ -6,8 +6,9 @@ import com.example.layeredarchitecture.model.ItemDTO;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ItemDAOimpl {
+public class ItemDAOimpl implements  ItemDAO{
 
+    @Override
     public ArrayList<ItemDTO> getAllItems() throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
         Statement stm = connection.createStatement();
@@ -25,6 +26,7 @@ public class ItemDAOimpl {
         return ItemDtoList ;
     }
 
+    @Override
     public boolean saveItems(ItemDTO dto) throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -37,6 +39,7 @@ public class ItemDAOimpl {
 
     }
 
+    @Override
     public boolean upateItems(ItemDTO dto) throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -48,6 +51,8 @@ public class ItemDAOimpl {
         return  pstm.executeUpdate() > 0 ;
 
     }
+
+    @Override
     public boolean deleteItems(String code) throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -57,6 +62,7 @@ public class ItemDAOimpl {
 
     }
 
+    @Override
     public boolean getExitItem(String code) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
@@ -65,6 +71,7 @@ public class ItemDAOimpl {
     }
 
 
+    @Override
     public String generateNewItemCode() throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -77,6 +84,20 @@ public class ItemDAOimpl {
             return "I00-001";
         }
 
+    }
+
+    @Override
+    public ItemDTO findItem(String code) throws SQLException, ClassNotFoundException {
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Item WHERE code=?");
+        pstm.setString(1, code);
+        ResultSet rst = pstm.executeQuery();
+
+        while (rst.next()){
+            return new ItemDTO(rst.getString(1), rst.getString(2),rst.getBigDecimal(3),rst.getInt(4));
+        }
+
+        return null;
     }
 
 }

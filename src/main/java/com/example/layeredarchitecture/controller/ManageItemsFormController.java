@@ -1,5 +1,8 @@
 package com.example.layeredarchitecture.controller;
 
+import com.example.layeredarchitecture.DAO.CustomerDAO;
+import com.example.layeredarchitecture.DAO.CustomerDAOimpl;
+import com.example.layeredarchitecture.DAO.ItemDAO;
 import com.example.layeredarchitecture.DAO.ItemDAOimpl;
 import com.example.layeredarchitecture.db.DBConnection;
 import com.example.layeredarchitecture.model.CustomerDTO;
@@ -37,6 +40,9 @@ public class ManageItemsFormController {
     public TableView<ItemTM> tblItems;
     public TextField txtUnitPrice;
     public JFXButton btnAddNewItem;
+
+
+    ItemDAO itemDAO = new ItemDAOimpl();
 
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -76,7 +82,7 @@ public class ManageItemsFormController {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM Item");
             */
-            ItemDAOimpl itemDAO = new ItemDAOimpl();
+
             ArrayList<ItemDTO> itemList = itemDAO.getAllItems();
             for (ItemDTO dto : itemList) {
                 tblItems.getItems().add(new ItemTM( dto.getCode() , dto.getDescription() , dto.getUnitPrice() , dto.getQtyOnHand()));
@@ -144,12 +150,13 @@ public class ManageItemsFormController {
             PreparedStatement pstm = connection.prepareStatement("DELETE FROM Item WHERE code=?");
             pstm.setString(1, code);
             pstm.executeUpdate();*/
-            ItemDAOimpl itemDAO = new ItemDAOimpl();
-            boolean isDelete =itemDAO.deleteItems(code);
+
+            boolean isDelete = itemDAO.deleteItems(code);
 
             tblItems.getItems().remove(tblItems.getSelectionModel().getSelectedItem());
             tblItems.getSelectionModel().clearSelection();
             initUI();
+
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Failed to delete the item " + code).show();
         } catch (ClassNotFoundException e) {
@@ -193,7 +200,7 @@ public class ManageItemsFormController {
                 pstm.setInt(4, qtyOnHand);
                 pstm.executeUpdate();
                 */
-                ItemDAOimpl itemDAO = new ItemDAOimpl();
+
                 boolean isAddItem  = itemDAO.saveItems(new ItemDTO(code , description , unitPrice , qtyOnHand));
                 if (isAddItem){ tblItems.getItems().add(new ItemTM(code, description, unitPrice, qtyOnHand)); }
 
@@ -216,7 +223,7 @@ public class ManageItemsFormController {
                 pstm.setInt(3, qtyOnHand);
                 pstm.setString(4, code);
                 pstm.executeUpdate();*/
-                ItemDAOimpl itemDAO = new ItemDAOimpl();
+
                 boolean isUpdate = itemDAO.upateItems(new ItemDTO(code , description , unitPrice , qtyOnHand));
 
                 ItemTM selectedItem = tblItems.getSelectionModel().getSelectedItem();
@@ -241,7 +248,7 @@ public class ManageItemsFormController {
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
         pstm.setString(1, code);
         */
-        ItemDAOimpl itemDAO = new ItemDAOimpl();
+
         return itemDAO.getExitItem(code);
     }
 
@@ -257,7 +264,7 @@ public class ManageItemsFormController {
             } else {
                 return "I00-001";
             }*/
-            ItemDAOimpl itemDAO = new ItemDAOimpl();
+
             return  itemDAO.generateNewItemCode();
 
         } catch (SQLException e) {

@@ -6,9 +6,9 @@ import com.example.layeredarchitecture.model.CustomerDTO;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class CustomerDAOimpl {
+public class CustomerDAOimpl implements CustomerDAO {
 
-
+    @Override
     public ArrayList<CustomerDTO> getAllCustomer() throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -27,7 +27,7 @@ public class CustomerDAOimpl {
         }
         return customerDTOLIST;
     }
-
+    @Override
     public boolean saveCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -40,6 +40,7 @@ public class CustomerDAOimpl {
 
     }
 
+    @Override
     public boolean updateCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -53,7 +54,7 @@ public class CustomerDAOimpl {
     }
 
 
-
+    @Override
     public boolean getExistCustomer(String id) throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement pstm = connection.prepareStatement("SELECT id FROM Customer WHERE id=?");
@@ -64,7 +65,7 @@ public class CustomerDAOimpl {
     }
 
 
-
+    @Override
     public boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -74,6 +75,7 @@ public class CustomerDAOimpl {
 
     }
 
+    @Override
     public String generateNewCusID() throws SQLException, ClassNotFoundException {
 
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -85,7 +87,20 @@ public class CustomerDAOimpl {
         } else {
             return "C00-001";
         }
+    }
 
+    @Override
+    public CustomerDTO findCustomer(String id) throws SQLException, ClassNotFoundException {
+
+        Connection connection = DBConnection.getDbConnection().getConnection();
+        PreparedStatement pstm = connection.prepareStatement("SELECT * FROM Customer WHERE id=?");
+        pstm.setString(1, id + "");
+        ResultSet rst = pstm.executeQuery();
+        while (rst.next()){
+            return  new CustomerDTO(rst.getString(1),rst.getString(2),rst.getString(3));
+        }
+
+        return null;
     }
 
 }
