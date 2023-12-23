@@ -76,4 +76,22 @@ CREATE TABLE `OrderDetails` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
-select * from Item;
+/*select * from Item;
+select * from Customer;
+select * from OrderDetails;
+select * from Orders;
+
+delete from Orders WHERE customerID = 'C00-001';
+
+truncate OrderDetails;
+truncate Orders;*/
+
+/*delete from Customer WHERE id = 'C00-001';*/
+
+select * from Orders;
+select * from Customer;
+select * from OrderDetails;
+
+SELECT  Orders.customerID ,Customer.name , COUNT(Orders.customerID) FROM Orders
+JOIN Customer ON Orders.customerID = Customer.id group by Orders.customerID;
+

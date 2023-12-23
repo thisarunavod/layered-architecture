@@ -1,11 +1,9 @@
 package com.example.layeredarchitecture.controller;
 
-import com.example.layeredarchitecture.DAO.CustomerDAO;
-import com.example.layeredarchitecture.DAO.CustomerDAOimpl;
-import com.example.layeredarchitecture.DAO.ItemDAO;
-import com.example.layeredarchitecture.DAO.ItemDAOimpl;
-import com.example.layeredarchitecture.db.DBConnection;
-import com.example.layeredarchitecture.model.CustomerDTO;
+import com.example.layeredarchitecture.DAO.Custom.ItemDAO;
+import com.example.layeredarchitecture.DAO.Custom.impl.ItemDAOimpl;
+import com.example.layeredarchitecture.bo.ItemBO;
+import com.example.layeredarchitecture.bo.ItemBOimpl;
 import com.example.layeredarchitecture.model.ItemDTO;
 import com.example.layeredarchitecture.view.tdm.ItemTM;
 import com.jfoenix.controls.JFXButton;
@@ -42,7 +40,10 @@ public class ManageItemsFormController {
     public JFXButton btnAddNewItem;
 
 
-    ItemDAO itemDAO = new ItemDAOimpl();
+
+
+    ItemBO itemBO = new ItemBOimpl();
+
 
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -77,20 +78,14 @@ public class ManageItemsFormController {
     private void loadAllItems() {
         tblItems.getItems().clear();
         try {
-            /*Get all items*/
-            /*Connection connection = DBConnection.getDbConnection().getConnection();
-            Statement stm = connection.createStatement();
-            ResultSet rst = stm.executeQuery("SELECT * FROM Item");
-            */
 
-            ArrayList<ItemDTO> itemList = itemDAO.getAllItems();
+            ArrayList<ItemDTO> itemList = itemBO.getAll();
+
             for (ItemDTO dto : itemList) {
-                tblItems.getItems().add(new ItemTM( dto.getCode() , dto.getDescription() , dto.getUnitPrice() , dto.getQtyOnHand()));
+                tblItems.getItems().add(new ItemTM( dto.getCode() , dto.getDescription() , dto.getQtyOnHand(), dto.getUnitPrice()));
             }
 
-            /*while (rst.next()) {
-                tblItems.getItems().add(new ItemTM(rst.getString("code"), rst.getString("description"), rst.getBigDecimal("unitPrice"), rst.getInt("qtyOnHand")));
-            }*/
+
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
         } catch (ClassNotFoundException e) {
@@ -146,12 +141,9 @@ public class ManageItemsFormController {
             if (!existItem(code)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
             }
-            /*Connection connection = DBConnection.getDbConnection().getConnection();
-            PreparedStatement pstm = connection.prepareStatement("DELETE FROM Item WHERE code=?");
-            pstm.setString(1, code);
-            pstm.executeUpdate();*/
 
-            boolean isDelete = itemDAO.deleteItems(code);
+            /*boolean isDelete = itemDAO.delete(code);*/
+            boolean isDelete = itemBO.delete(code);
 
             tblItems.getItems().remove(tblItems.getSelectionModel().getSelectedItem());
             tblItems.getSelectionModel().clearSelection();
@@ -192,17 +184,9 @@ public class ManageItemsFormController {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
                 }
                 //Save Item
-                /*Connection connection = DBConnection.getDbConnection().getConnection();
-                PreparedStatement pstm = connection.prepareStatement("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)");
-                pstm.setString(1, code);
-                pstm.setString(2, description);
-                pstm.setBigDecimal(3, unitPrice);
-                pstm.setInt(4, qtyOnHand);
-                pstm.executeUpdate();
-                */
-
-                boolean isAddItem  = itemDAO.saveItems(new ItemDTO(code , description , unitPrice , qtyOnHand));
-                if (isAddItem){ tblItems.getItems().add(new ItemTM(code, description, unitPrice, qtyOnHand)); }
+                /*boolean isAddItem  = itemDAO.save(new ItemDTO(code , description , qtyOnHand, unitPrice ));*/
+                boolean isAddItem  = itemBO.save(new ItemDTO(code , description , qtyOnHand, unitPrice ));
+                if (isAddItem){ tblItems.getItems().add(new ItemTM(code, description, qtyOnHand ,unitPrice)); }
 
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
@@ -216,15 +200,8 @@ public class ManageItemsFormController {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
                 /*Update Item*/
-                /*Connection connection = DBConnection.getDbConnection().getConnection();
-                PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
-                pstm.setString(1, description);
-                pstm.setBigDecimal(2, unitPrice);
-                pstm.setInt(3, qtyOnHand);
-                pstm.setString(4, code);
-                pstm.executeUpdate();*/
-
-                boolean isUpdate = itemDAO.upateItems(new ItemDTO(code , description , unitPrice , qtyOnHand));
+                /*boolean isUpdate = itemDAO.update(new ItemDTO(code , description , qtyOnHand, unitPrice));*/
+                boolean isUpdate = itemBO.update(new ItemDTO(code , description , qtyOnHand, unitPrice));
 
                 ItemTM selectedItem = tblItems.getSelectionModel().getSelectedItem();
                 selectedItem.setDescription(description);
@@ -244,12 +221,10 @@ public class ManageItemsFormController {
 
 
     private boolean existItem(String code) throws SQLException, ClassNotFoundException {
-        /*Connection connection = DBConnection.getDbConnection().getConnection();
-        PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
-        pstm.setString(1, code);
-        */
 
-        return itemDAO.getExitItem(code);
+        /*return itemDAO.getExist(code);*/
+        return itemBO.getExist(code);
+
     }
 
 
@@ -265,7 +240,8 @@ public class ManageItemsFormController {
                 return "I00-001";
             }*/
 
-            return  itemDAO.generateNewItemCode();
+            /*return  itemDAO.generateNewID();*/
+            return itemBO.generateNewID();
 
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, e.getMessage()).show();

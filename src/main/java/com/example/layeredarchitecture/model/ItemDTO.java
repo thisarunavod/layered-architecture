@@ -14,11 +14,11 @@ public class ItemDTO implements Serializable {
     public ItemDTO() {
     }
 
-    public ItemDTO(String code, String description, BigDecimal unitPrice, int qtyOnHand) {
+    public ItemDTO(String code, String description, int qtyOnHand, BigDecimal unitPrice) {
         this.code = code;
         this.description = description;
-        this.unitPrice = unitPrice;
         this.qtyOnHand = qtyOnHand;
+        this.unitPrice = unitPrice;
     }
 
     public String getCode() {
